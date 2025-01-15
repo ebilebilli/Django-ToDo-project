@@ -18,6 +18,7 @@ class Note(models.Model):
         blank=True
     )
     is_completed = models.BooleanField(default=False)
+    is_pinned = models.BooleanField(default=False)
 
 
     Processing = 'processing'
