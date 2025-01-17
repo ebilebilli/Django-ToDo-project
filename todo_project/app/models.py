@@ -17,17 +17,17 @@ class Note(models.Model):
         null=True,
         blank=True
     )
-    is_completed = models.BooleanField(default=False)
-    is_pinned = models.BooleanField(default=False)
-
-
     Processing = 'processing'
     Completed = 'completed'
     
     STATUS_BAR_LIST = [
         (Processing, 'Processing'),
         (Completed, 'Completed')
-    ]
+    ]    
+    
+    is_completed = models.BooleanField(default=False)
+    is_pinned = models.BooleanField(default=False)
+
     context = models.TextField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 

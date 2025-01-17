@@ -16,16 +16,29 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        video#background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
         }
 
         .container {
             width: 100%;
             max-width: 800px;
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
             padding: 40px;
             margin: 20px;
+            z-index: 1;
         }
 
         h1 {
@@ -34,6 +47,7 @@
             font-size: 2.5rem;
             margin-bottom: 30px;
         }
+
         .pin-icon {
             height: 16px;
             width: 16px;
@@ -48,7 +62,6 @@
             transform: scale(1.5);
             animation: pin-bounce 0.5s ease-in-out forwards;
         }
-
 
         .checkbox.completed {
             animation: checkbox-bounce 0.5s ease-in-out forwards;
@@ -123,6 +136,12 @@
             list-style-type: none;
             padding: 0;
             margin: 0;
+        }
+
+        .note-list li a {
+            text-decoration: none;
+            color: #333;
+            font: bold 1.5em 'Arial', sans-serif;
         }
 
         .note-item {
@@ -212,6 +231,11 @@
     </style>
 </head>
 <body>
+    <video id="background-video" autoplay muted loop>
+        <source src="{% static 'icons/1108057113-preview.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
     <div class="container">
         <h1>ToDo List</h1>
 
@@ -240,13 +264,13 @@
                             <input type="checkbox" name="is_completed" class="checkbox" {% if note.is_completed %}checked{% endif %} onchange="this.form.submit()">
                         </form>
                     </div>
-                    <span>{{ note.context }}</span>
+                    <a href="{% url 'app:detail_page' pk=note.id %}"><span>{{ note.context }}</span></a>
+
                     <div>
                         <form action="{% url 'app:delete_note' pk=note.id %}" method="post">
                             {% csrf_token %}
                             <button type="submit" class="delete">Delete</button>
                         </form>
-
 
                         <form action="{% url 'app:pin_note' pk=note.id %}" method="post">
                             {% csrf_token %}
@@ -255,8 +279,6 @@
                                 <img src="{% static 'icons/push-pin_4245772.png' %}" alt="Pin" class="pin-icon">
                             </button>
                         </form>
-                        
-
                     </div>
                 </li>
             {% empty %}
