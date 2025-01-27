@@ -39,6 +39,7 @@ class Note(models.Model):
 
 
 class Trash_Bin(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     bin_name = models.CharField(max_length=100)
     deleted_at = models.DateTimeField(auto_now_add=True)
 

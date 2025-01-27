@@ -5,10 +5,12 @@ from .models import Note, Label, Trash_Bin
 from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
-
+@login_required(login_url='account:login')
 def home_page(request):
-    labels = Label.objects.all()
+    user = request.user
+    labels = Label.objects.filter(user=user)
     notes = Note.objects.filter(label__in=labels,).order_by('-is_pinned', '-created_at')
 
     selected_label = labels.first() if labels.exists() else None
@@ -39,7 +41,7 @@ def detail_page(request, pk):
 
 def create_new_label(request):
     label_name = request.POST.get('label_name') 
-    Label.objects.create(title=label_name)
+    Label.objects.create(title=label_name, user=request.user)
     return redirect(reverse('app:index'))
 
 
@@ -88,7 +90,8 @@ def delete_note(request, pk):
 
 
 def trash_bin(request):
-    trashed_notes = Trash_Bin.objects.filter(note__is_trashed=True)
+    user = request.user
+    trashed_notes = Trash_Bin.objects.filter(note__is_trashed=True, user=user)
     for note in trashed_notes:
         note.label_title = note.label.title if note.label else "No Label"
     

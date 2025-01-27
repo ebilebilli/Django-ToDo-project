@@ -4,6 +4,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOGIN_REDIRECT_URL = '//index/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -15,8 +16,7 @@ SECRET_KEY = 'django-insecure-%(_qfb)+(ncu%g3f@=zy%5t&-!_twut=a4ppt2knp@w3!drr)u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['keepnotes-a5e16cba38dc.herokuapp.com', 'your-domain.com']
-
+#ALLOWED_HOSTS = ['keepnotes-a5e16cba38dc.herokuapp.com', 'your-domain.com']
 
 
 
@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app'
+    'app',
+    'account'
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
