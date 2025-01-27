@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-%(_qfb)+(ncu%g3f@=zy%5t&-!_twut=a4ppt2knp@w3!drr)u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = ['keepnotes-a5e16cba38dc.herokuapp.com', 'your-domain.com']
+ALLOWED_HOSTS = ['keepnotes-a5e16cba38dc.herokuapp.com', 'your-domain.com']
 
 
 
@@ -67,7 +67,7 @@ WSGI_APPLICATION = 'todo_project.wsgi.application'
 
 
 # Database
-https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
