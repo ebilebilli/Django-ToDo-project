@@ -32,6 +32,7 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         th, td {
@@ -59,6 +60,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-size: 14px;
         }
 
         td button:hover {
@@ -100,6 +102,29 @@
             font-size: 18px;
             color: #6c757d;
         }
+
+        .form-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-container form {
+            margin: 0;
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .badge.bg-success {
+            background-color: #28a745;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -130,19 +155,21 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <form method="post" action="{% url 'app:restore_note' note.pk %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit">
-                                        <img src="{% static 'icons/reset.png' %}" alt="Restore">
-                                        Restore
-                                    </button>
-                                </form>
-                                <form method="post" action="{% url 'app:delete_note_permanently' note.pk %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="delete">
-                                        Delete Permanently
-                                    </button>
-                                </form>
+                                <div class="form-container">
+                                    <form method="post" action="{% url 'app:restore_note' note.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit">
+                                            <img src="{% static 'icons/reset.png' %}" alt="Restore">
+                                            Restore
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'app:delete_note_permanently' note.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="delete">
+                                            Delete Permanently
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}

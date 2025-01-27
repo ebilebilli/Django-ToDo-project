@@ -90,9 +90,10 @@ def delete_note(request, pk):
 
 
 def trash_bin(request):
-    user = request.user
-    trashed_notes = Trash_Bin.objects.filter(note__is_trashed=True, user=user)
+    #user = request.user
+    trashed_notes = Trash_Bin.objects.filter(note__is_trashed=True)
     for note in trashed_notes:
+        note.context = note.note.context
         note.label_title = note.label.title if note.label else "No Label"
     
     return render(request, 'trash_bin.html', {'trashed_notes': trashed_notes})
