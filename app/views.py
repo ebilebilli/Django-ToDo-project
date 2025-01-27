@@ -39,7 +39,7 @@ def detail_page(request, pk):
 
 def create_new_label(request):
     label_name = request.POST.get('label_name') 
-    Label.objects.create(title=label_name, user=request.user)
+    Label.objects.create(title=label_name)
     return redirect(reverse('app:index'))
 
 
