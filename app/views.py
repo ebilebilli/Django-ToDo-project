@@ -80,8 +80,10 @@ def complete_note(request, pk):
 
 
 def delete_note(request, pk):
+    user = request.user
     note = get_object_or_404(Note, pk=pk)
-    Trash_Bin.objects.create(label=note.label, note=note, deleted_at=timezone.now()) 
+    Trash_Bin.objects.create(label=note.label, note=note, user=user, deleted_at=timezone.now())
+    
     note.is_trashed = True
     note.save()
     
@@ -91,7 +93,7 @@ def delete_note(request, pk):
 
 def trash_bin(request):
     user = request.user
-    trashed_notes = Trash_Bin.objects.filter(note__is_trashed=True, user=user)
+    trashed_notes = Trash_Bin.objects.filter(user=user)
     for note in trashed_notes:
         note.context = note.note.context
         note.label_title = note.label.title 
