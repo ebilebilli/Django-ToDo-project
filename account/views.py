@@ -33,7 +33,7 @@ def register_request(request):
 
         User.objects.create_user(username=username, email=email, password=password)
         messages.success(request, 'Account created successfully')
-        return redirect('login.html')
+        return redirect('account:login')
     
     return render(request, 'register.html')
 
