@@ -5,7 +5,7 @@ app_name = 'app'
 
 urlpatterns = [
     path('', views.home_page, name='index'),
-    path('detail_page/<int:pk>', views.detail_page, name='detail_page'),
+    path('detail_page/<int:pk>/', views.detail_page, name='detail_page'),
     path('get_notes/<int:label_id>/', views.get_notes, name='get_notes'),
     path('edit_note/<int:pk>', views.edit_note, name='edit_note'),
     path('create_new_label/', views.create_new_label, name='create_new_label'), 

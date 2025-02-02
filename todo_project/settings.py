@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-%(_qfb)+(ncu%g3f@=zy%5t&-!_twut=a4ppt2knp@w3!drr)u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['keepnotes-a5e16cba38dc.herokuapp.com', 'your-domain.com']
+#ALLOWED_HOSTS = ['keepnotes-a5e16cba38dc.herokuapp.com', 'your-domain.com']
 
 
 
@@ -41,7 +41,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'todo_project.middleware.LoginRequiredMiddleware',
     
 ]
 

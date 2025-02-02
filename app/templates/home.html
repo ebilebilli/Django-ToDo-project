@@ -279,6 +279,7 @@
                 <a href="{% url 'app:trash_bin' %}" style="margin-top: 20px; display: block; color: #4285f4;">Go to Trash Bin</a>
             </div>
         </div>
+        
 
         <div class="content">
             <h3 id="label-title">
@@ -301,6 +302,11 @@
             </ul>
         </div>
     </div>
+
+    <div style="margin-top: 20px;">
+        <a href="{% url 'account:logout' %}" style="display: block; color: #4285f4;">Logout</a>
+    </div>
+    
 
     <style>
         .pin-btn {
@@ -346,7 +352,7 @@
                     
                     // Create a clickable link to the detail page for the note
                     const noteLink = document.createElement('a');
-                    noteLink.href = `/detail_page/${note.id}/`;  // Assuming the URL pattern is like this
+                    noteLink.href = `/detail_page/${note.id}/`;
                     noteLink.textContent = note.context;
                     noteContent.appendChild(noteLink);
                     

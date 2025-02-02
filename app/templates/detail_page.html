@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Note Detail</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         /* Basic Reset */
         * {
@@ -16,40 +16,40 @@
 
         /* Body and Background */
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f1f3f4;
-            color: #202124;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-            padding: 40px;
-            overflow-x: hidden;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         /* Main Container Styling */
         .container {
             background-color: #ffffff;
-            border-radius: 8px;
+            border-radius: 12px;
             width: 100%;
             max-width: 600px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
             display: flex;
             flex-direction: column;
+            gap: 20px;
         }
 
         h1 {
             font-size: 24px;
-            color: #333333;
-            font-weight: 500;
+            color: #333;
+            font-weight: 600;
             margin-bottom: 10px;
         }
 
         .note-details {
             font-size: 16px;
-            color: #5f6368;
-            margin-top: 20px;
+            color: #555;
+            margin-top: 10px;
         }
 
         .note-details p {
@@ -57,18 +57,18 @@
         }
 
         .note-details span {
-            font-weight: bold;
-            color: #202124;
+            font-weight: 500;
+            color: #333;
         }
 
         /* Note Context and Image Styling */
         .note-context {
-            margin-top: 30px;
-            font-size: 18px;
-            color: #202124;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
             line-height: 1.6;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f1f3f4;
             border-radius: 8px;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -77,7 +77,7 @@
 
         /* Back Button Styling */
         .back-button {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
         }
 
@@ -85,9 +85,10 @@
             background-color: #4CAF50;
             color: white;
             text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 12px 24px;
+            border-radius: 6px;
             font-size: 1rem;
+            font-weight: 500;
             transition: background-color 0.3s ease;
         }
 
@@ -108,24 +109,27 @@
             margin-right: 8px;
         }
 
-        .edit-button a, .edit-button button {
-            color: #4CAF50;
+        .edit-button button {
+            background-color: #4CAF50;
+            color: white;
             font-size: 1rem;
+            font-weight: 500;
             text-decoration: none;
-            font-weight: bold;
-            background: none;
+            padding: 12px 24px;
             border: none;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .edit-button a:hover, .edit-button button:hover {
-            color: #45a049;
+        .edit-button button:hover {
+            background-color: #45a049;
         }
 
         /* Responsive Styling */
         @media (max-width: 768px) {
             .container {
-                padding: 15px;
+                padding: 20px;
             }
 
             .note-context {
@@ -142,12 +146,10 @@
     <div class="container">
         <h1>Note Detail</h1>
 
-       
         <div class="note-context" id="view-context">
             {{ note.context }}
         </div>
 
-     
         <form action="{% url 'app:edit_note' pk=note.id %}" method="post" id="edit-form" style="display: none;">
             {% csrf_token %}
             <div class="note-context">
@@ -160,14 +162,12 @@
             <p><span>Pinned:</span> {% if note.is_pinned %}Yes{% else %}No{% endif %}</p>
         </div>
 
-      
         <div class="edit-button">
             <button onclick="toggleEditMode()">
                 <img src="{% static 'icons/1159633.png' %}" alt="Edit Icon"> Edit Note
             </button>
         </div>
 
-     
         <div class="back-button">
             <a href="{% url 'app:index' %}">Back to Notes</a>
         </div>
@@ -180,16 +180,16 @@
             var editButton = document.querySelector('.edit-button button');
 
             if (editForm.style.display === 'none') {
-                
+                // Switch to edit mode
                 viewContext.style.display = 'none';
                 editForm.style.display = 'block';
                 editButton.textContent = 'Save';
                 editButton.onclick = function() { 
-                  
+                    // Submit the form when save is clicked
                     document.getElementById('edit-form').submit();
                 };
             } else {
-               
+                // Switch back to view mode
                 editForm.style.display = 'none';
                 viewContext.style.display = 'block';
                 editButton.textContent = 'Edit Note';
@@ -198,5 +198,4 @@
         }
     </script>
 </body>
-</html>
 </html>

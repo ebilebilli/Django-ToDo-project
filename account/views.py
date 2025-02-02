@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth import logout
 
 # Create your views here.
 
@@ -39,4 +40,5 @@ def register_request(request):
 
 
 def logout_request(request):
-    return redirect('index')
+    logout(request)
+    return redirect('account:login')

@@ -34,7 +34,8 @@ def get_notes(request, label_id):
 
 
 def detail_page(request, pk):
-    note = get_object_or_404(Note, pk=pk)
+    user = request.user
+    note = get_object_or_404(Note, pk=pk, label__user=user)
     context = {'note': note}
     return render(request, 'detail_page.html', context)
 
