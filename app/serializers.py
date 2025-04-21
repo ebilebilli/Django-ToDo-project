@@ -9,16 +9,16 @@ class LabelSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
-    label = LabelSerializer()
+    label = serializers.SlugRelatedField(queryset=Label.objects.filter(is_trashed=False), slug_field='title')
 
     class Meta:
         model = Note
         fields = '__all__'
-
+        
 
 class TrashBinSerializer(serializers.ModelSerializer):
-    note = NoteSerializer(read_only=True)
-    label = LabelSerializer(read_only=True)
+    note = serializers.PrimaryKeyRelatedField(queryset=Note.objects.all())
+    label = serializers.PrimaryKeyRelatedField(queryset=Label.objects.all())
     
     class Meta:
         model = Trash_Bin

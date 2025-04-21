@@ -54,6 +54,9 @@ yarl = "==1.18.3"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 drf-yasg = "*"
+pytest = "*"
+pytest-django = "*"
+pytest-cov = "*"
 
 [dev-packages]
 

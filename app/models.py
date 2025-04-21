@@ -21,6 +21,13 @@ class Label(models.Model):
 
 
 class Note(models.Model):
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        null=True, 
+        blank=True 
+    )
+    
     label = models.ForeignKey(
         Label,
         on_delete=models.CASCADE,
@@ -48,15 +55,15 @@ class Note(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.context[:-20]}'
+         return self.context
 
 
 class Trash_Bin(models.Model):
     user = models.ForeignKey(
         User, 
-        on_delete=models.CASCADE, 
+        on_delete=models.CASCADE,
         null=True, 
-        blank=True
+        blank=True 
     )
     label = models.ForeignKey(
         Label, 
@@ -68,7 +75,9 @@ class Trash_Bin(models.Model):
     note = models.ForeignKey(
         Note, 
         on_delete=models.CASCADE,
-        related_name='trashed_notes'
+        related_name='trashed_notes',
+        null=True,
+        blank=True
     ) 
    
     deleted_at = models.DateTimeField(auto_now_add=True)
@@ -98,4 +107,6 @@ class Trash_Bin(models.Model):
         return super().save(*args, **kwargs)
     
     def __str__(self):
-        return self.note.context[:-20]
+        if self.note:
+            return self.note.context  
+        return ''

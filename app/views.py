@@ -133,7 +133,7 @@ class CreateNoteAPIView(APIView):
 
     def post(self, request):
         data = request.data
-        serializer = NoteSerializer(data=data)
+        serializer = NoteSerializer(data=data, many=False)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -162,7 +162,7 @@ class TrashBinLabelListAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, *args, **kwargs):
-        queryset = Trash_Bin.objects.filter(is_trashed=True)
+        queryset = Trash_Bin.objects.filter(is_trashed=True).order_by('-deleted_at')
         label_title = request.query_params.get('label')
         if label_title:
             queryset = queryset.filter(label__title__iexact=label_title)
@@ -197,7 +197,7 @@ class TrashBinNoteListAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, *args, **kwargs):
-        queryset = Trash_Bin.objects.filter(is_trashed=True)
+        queryset = Trash_Bin.objects.filter(is_trashed=True).order_by('-deleted_at')
         note_title = request.query_params.get('note')  
         if note_title:
             queryset = queryset.filter(note__title__iexact=note_title)  
