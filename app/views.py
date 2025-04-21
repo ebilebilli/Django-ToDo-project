@@ -1,155 +1,283 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.urls import reverse
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView, status, Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.db import transaction
+
 from .models import Note, Label, Trash_Bin
-from django.utils import timezone
-from datetime import timedelta
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-
-@login_required(login_url='account:login')
-def home_page(request):
-    user = request.user
-    labels = Label.objects.filter(user=user)
-    notes = Note.objects.filter(label__in=labels,).order_by('-is_pinned', '-created_at')
-
-    selected_label = labels.first() if labels.exists() else None
-
-    context = {
-        'label_list': labels, 
-        'note_list': notes,
-        'selected_label': selected_label,
-    }
-    return render(request, 'home.html', context)
+from .serializers import NoteSerializer, LabelSerializer, TrashBinSerializer
+from utils.permission import HeHasPermission
+from utils.pagination import CustomPagination
 
 
-def get_notes(request, label_id):
-    notes = Note.objects.filter(label_id=label_id, is_trashed=False).values(
-        'id', 'context', 'is_completed', 'is_pinned'
-        ).order_by(
-        '-is_pinned', '-created_at'
-        )
+class LabelListAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+    pagination_class = CustomPagination
+
+    def get(self, request):
+        pagination = self.pagination_class()
+        labels = Label.objects.filter(is_trashed=False).order_by('-created_at')
+        if labels.exists():
+            result_page = pagination.paginate_queryset(labels, request) 
+            serializer = LabelSerializer(result_page, many=True)
+            return pagination.get_paginated_response(serializer.data)
+        return Response({'message': 'The are no labels'}, status=status.HTTP_404_NOT_FOUND)
     
-    return JsonResponse({'notes': list(notes)})
+
+class LabelDetailAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
 
 
-def detail_page(request, pk):
-    user = request.user
-    note = get_object_or_404(Note, pk=pk, label__user=user)
-    context = {'note': note}
-    return render(request, 'detail_page.html', context)
-
-
-def create_new_label(request):
-    label_name = request.POST.get('label_name') 
-    Label.objects.create(title=label_name, user=request.user)
-    return redirect(reverse('app:index'))
-
-
-def create_new_note(request):
-    note_context = request.POST.get('context')
-    label_id = request.POST.get('label_id')  
-
-    label = Label.objects.filter(id=label_id).first() 
-    Note.objects.create(context=note_context, label=label)
-   
-    return redirect(reverse('app:index'))
-  
-def edit_note(request, pk):
-    note = get_object_or_404(Note, pk=pk)
-    label_id = request.POST.get('label_id')
-    label = Label.objects.filter(id=label_id).first()
+    def get(self, request, label_id):
+        label = get_object_or_404(Label.objects.filter(is_trashed=False), id=label_id)
+        serializer = LabelSerializer(label, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
-    if request.method == 'POST':
-        new_context = request.POST.get('context', '')
-        note.context = new_context
-        note.save()
-        messages.success(request, 'Note has been updated successfully!')
-        return redirect('app:index') 
+    def patch(self, request, label_id):
+        label = get_object_or_404(Label.objects.filter(is_trashed=False), id=label_id)
+        serializer = LabelSerializer(label, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    context = {'note': note}
-    return render(request, 'detail_page.html', context, label=label)
 
-def complete_note(request, pk):
-    note = get_object_or_404(Note, pk=pk)
+class CreateLabelAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def post(self, request):
+        data = request.data
+        serializer = LabelSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MoveLabelToTrashAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def post(self, request, label_id):
+        user = request.user
+        label = get_object_or_404(Label, id=label_id)
+        with transaction.atomic():
+            label.is_trashed = True
+            label.save()
+
+            trash_bin = Trash_Bin.objects.create(label=label, user=user)
+            trash_bin.full_clean()
+            return Response({'message': 'Label moved to trash successfully'})
+
+
+class NoteListForLabelAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+    pagination_class = CustomPagination
+
+    def get(self, request, label_id):
+        pagination = self.pagination_class()
+        label = get_object_or_404(Label.objects.filter(is_trashed=False), id=label_id)
+        notes = Note.objects.filter(is_trashed=False, label=label).order_by('-created_at','is_pinned')
+        if notes.exists():
+            result_page = pagination.paginate_queryset(notes, request)
+            serializer = NoteSerializer(result_page, many=True)
+            return pagination.get_paginated_response(serializer.data)
+        return Response({'message': 'There are no notes'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class NoteListAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+    pagination_class = CustomPagination
+
+    def get(self, request):
+        pagination = self.pagination_class()
+        notes = Note.objects.filter(is_trashed=False).order_by('-created_at')
+        if notes.exists():
+            result_page = pagination.paginate_queryset(notes, request)
+            serializer = NoteSerializer(result_page, many=True)
+            return pagination.get_paginated_response(serializer.data)
+        return Response({'message': 'There are no notes'}, status=status.HTTP_404_NOT_FOUND)
     
-    if request.method == 'POST':
-        note.is_completed = not note.is_completed
-        note.save()
+
+class NoteDetailAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def get(self, request, note_id):
+        note = get_object_or_404(Note.objects.filter(is_trashed=False), id=note_id)
+        serializer = NoteSerializer(note, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
-    return JsonResponse({'status': 'success', 'is_completed': note.is_completed})
-
-
-def delete_note(request, pk):
-    user = request.user
-    note = get_object_or_404(Note, pk=pk)
-    Trash_Bin.objects.create(label=note.label, note=note, user=user, deleted_at=timezone.now())
+    def patch(self, request, note_id):
+        note = get_object_or_404(Note.objects.filter(is_trashed=False), id=note_id)
+        pin_limit = 10
+        pinned_count = Note.objects.filter(user=request.user, is_pinned=True, is_trashed=False).count()
+        if pinned_count >= pin_limit:
+            return Response({'error': f'Pin limit {pin_limit} exceeded'},status=status.HTTP_400_BAD_REQUEST)
+                
+        serializer = NoteSerializer(note, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    note.is_trashed = True
-    note.save()
+
+class CreateNoteAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def post(self, request):
+        data = request.data
+        serializer = NoteSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MoveNoteToTrashAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def post(self, request, note_id):
+        user = request.user
+        note = get_object_or_404(Note, id=note_id)
+        with transaction.atomic():
+            note.is_trashed = True
+            note.save()
+
+            trash_bin = Trash_Bin.objects.create(note=note, user=user)
+            trash_bin.full_clean()
+            return Response({'message': 'Note moved to trash successfully'})
+
+
+class TrashBinLabelListAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+    pagination_class = CustomPagination
+
+    def get(self, request, *args, **kwargs):
+        queryset = Trash_Bin.objects.filter(is_trashed=True)
+        label_title = request.query_params.get('label')
+        if label_title:
+            queryset = queryset.filter(label__title__iexact=label_title)
+
+        pagination = self.pagination_class()
+        result_page = pagination.paginate_queryset(queryset, request)
+        serializer = TrashBinSerializer(result_page, many=True)
+        return pagination.get_paginated_response(serializer.data)
+
+
+class LabelInTrashDetailAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def get(self, request, label_id):
+        label=get_object_or_404(Label.objects.filter(is_trashed=True), id=label_id)
+        serializer = LabelSerializer(label, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, label_id):
+        label = get_object_or_404(Label.objects.filter(is_trashed=True), id=label_id)
+        with transaction.atomic():
+            label.is_trashed=False
+            label.save()
+            Trash_Bin.objects.filter(label=label).delete()
+            return Response({'message': 'Label restored successfully'}, status=status.HTTP_200_OK)
+
+
+class TrashBinNoteListAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+    pagination_class = CustomPagination
+
+    def get(self, request, *args, **kwargs):
+        queryset = Trash_Bin.objects.filter(is_trashed=True)
+        note_title = request.query_params.get('note')  
+        if note_title:
+            queryset = queryset.filter(note__title__iexact=note_title)  
+        pagination = self.pagination_class()
+        result_page = pagination.paginate_queryset(queryset, request)
+        serializer = TrashBinSerializer(result_page, many=True)
+        return pagination.get_paginated_response(serializer.data)
+
+
+class NoteInTrashDetailAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
+
+    def get(self, request, note_id):
+        note=get_object_or_404(Note.objects.filter(is_trashed=True), id=note_id)
+        serializer = NoteSerializer(note, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, note_id):
+        note = get_object_or_404(Note.objects.filter(is_trashed=True), id=note_id)
+        trash_bin = get_object_or_404(Trash_Bin, note=note)
+        with transaction.atomic():
+            note.is_trashed=False
+            if trash_bin.label:
+                note.label = trash_bin.label
+            else:
+                note.label = None
+            note.save()
+            Trash_Bin.objects.filter(note=note).delete()
+            return Response({'message': 'Note restored successfully'}, status=status.HTTP_200_OK)
+
+
+
     
-    messages.success(request, 'Note moved to trash successfully..')
-    return redirect(reverse('app:index'))
-
-
-def trash_bin(request):
-    user = request.user
-    trashed_notes = Trash_Bin.objects.filter(user=user)
-    for note in trashed_notes:
-        note.context = note.note.context
-        note.label_title = note.label.title 
-    
-    return render(request, 'trash_bin.html', {'trashed_notes': trashed_notes})
-
-
-def delete_note_permanently(request, pk):
-    note = get_object_or_404(Trash_Bin, pk=pk)
-    note.delete()
-
-    messages.success(request, 'Note deleted permanently')
-    return redirect('app:trash_bin')
-
-
-def delete_old_note():
-    limit_date = timezone.now() - timedelta(days=30)
-    trash_bin = Trash_Bin.objects.filter(deleted_at_lte = limit_date )
-    for trash in trash_bin:
-        trash.note.delete()  
-        trash.delete()  
         
 
-def restore_note(request, pk):
-    trash_note = get_object_or_404(Trash_Bin, pk=pk)
-    note = trash_note.note
-    note.is_trashed = False 
-    note.save()
-    
-    trash_note.delete()
-
-    messages.success(request, 'Note restored successfully')
-    return redirect(reverse('app:trash_bin'))
 
 
-def delete_label(request, pk):
-    label = get_object_or_404(Label, pk=pk) 
-    label.delete()
-    
-    messages.success(request, 'Label deleted successfully.')
-    return redirect(reverse('app:index')) 
 
 
-def pin_note(request, pk):
-    note = Note.objects.get(id=pk)
-    pin_limit = 6
-    actual_pinned_note = Note.objects.filter(is_pinned=True).count()
 
-    if request.method == 'POST':
-        if not note.is_pinned and actual_pinned_note >= pin_limit:
-            messages.error(request, 'Pin not is limit passed.')
-            return render(redirect('app:index'))
 
-        note.is_pinned = not note.is_pinned 
-        note.save()
-        return JsonResponse({'status': 'success', 'is_pinned': note.is_pinned})
-        
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,8 +6,8 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('app.urls')),
-    path('account/', include('account.urls')),  
+    path('api/v1/', include('app.urls')),
+    path('api/v1/', include('account.urls')),  
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

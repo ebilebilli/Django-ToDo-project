@@ -1,78 +1,118 @@
-# Django To-Do Application
+# Django To-Do REST API
 
-This is a Django-based To-Do application that allows users to create, manage, and organize their tasks. Users can create notes, assign labels, pin important notes, mark tasks as completed, and move tasks to a trash bin. The application also includes features like restoring deleted notes, permanently deleting notes, and managing labels.
+This is a Django-based RESTful To-Do application that allows users to create, manage, and organize their tasks through a modern API. Users can register, log in, create notes, assign labels, pin important notes, mark tasks as completed, and manage deleted items in a trash bin. The application uses Django REST Framework (DRF) and JWT for secure authentication.
 
 ## Features
 
-- **User Authentication:** Users can register, log in, and log out.
-- **Create Notes:** Users can create new notes and assign them to labels.
-- **Edit Notes:** Users can update the content of existing notes.
-- **Pin Notes:** Users can pin up to 6 important notes for quick access.
-- **Mark as Completed:** Users can mark tasks as completed or incomplete.
-- **Trash Bin:** Deleted notes are moved to a trash bin and can be restored or permanently deleted.
-- **Label Management:** Users can create, edit, and delete labels for better organization.
-- **Automatic Cleanup:** Notes in the trash bin for more than 30 days are automatically deleted.
+- **User Authentication**:
+  - Register new users with username, email, and password.
+  - Log in to receive JWT access and refresh tokens.
+  - Log out to invalidate tokens (client-side token removal).
+- **Note Management**:
+  - Create, update, and delete notes with content and optional labels.
+  - Pin up to 10 important notes for quick access.
+  - Mark notes as completed or incomplete.
+  - Filter notes by labels.
+- **Label Management**:
+  - Create, update, and delete labels for organizing notes.
+- **Trash Bin**:
+  - Move notes and labels to a trash bin for temporary storage.
+  - Restore notes or labels from the trash bin.
+  - Planned automatic cleanup for items in the trash bin after 30 days (using Celery Beat, under development).
+- **RESTful API**:
+  - Comprehensive API endpoints for all functionalities.
+  - Pagination for note and label lists.
+  - Secure access with JWT authentication and custom permissions (`HeHasPermission`).
+- **Modern Architecture**:
+  - Uses Django REST Framework and Simple JWT for authentication.
+  - Modular code structure with serializers, custom permissions, and pagination.
 
-Usage
-User Registration and Login
-Register a new account by visiting the registration page (/register).
+## Technologies Used
 
-Log in using your credentials at the login page (/login).
+- **Backend**: Django, Django REST Framework
+- **Authentication**: Simple JWT (JSON Web Tokens)
+- **Database**: SQLite (default, can be configured for PostgreSQL or others)
+- **Python Libraries**: `djangorestframework`, `djangorestframework-simplejwt`
 
-Managing Notes
-Create a Note: On the home page, enter the note content and select a label (if any) to create a new note.
+# Installation
+git clone https://github.com/ebilebilli/django-todo-api.git
+cd django-todo-api
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser  # Optional
+python manage.py runserver
 
-Edit a Note: Click on a note to view its details and update its content.
+# API will be available at http://localhost:8000
 
-Pin a Note: Click the pin icon to pin a note. Only 6 notes can be pinned at a time.
+# Usage Examples (using curl):
 
-Mark as Completed: Click the checkbox to mark a note as completed.
+# User Registration
+curl -X POST http://localhost:8000/api/register/ \
+-H "Content-Type: application/json" \
+-d '{"username": "testuser", "email": "test@example.com", "password": "strongpassword123"}'
 
-Delete a Note: Move a note to the trash bin by clicking the delete button.
+# User Login
+curl -X POST http://localhost:8000/api/token/ \
+-H "Content-Type: application/json" \
+-d '{"username": "testuser", "password": "strongpassword123"}'
 
-Managing Labels
-Create a Label: Use the label creation form to add a new label.
+# Create Note (replace <access_token> with actual token)
+curl -X POST http://localhost:8000/api/notes/create/ \
+-H "Authorization: Bearer <access_token>" \
+-H "Content-Type: application/json" \
+-d '{"context": "Buy groceries", "label": 1}'
 
-Delete a Label: Delete a label from the label management section.
+# Pin Note
+curl -X PATCH http://localhost:8000/api/notes/1/ \
+-H "Authorization: Bearer <access_token>" \
+-H "Content-Type: application/json" \
+-d '{"is_pinned": true}'
 
-Trash Bin
-Restore a Note: Restore a deleted note from the trash bin.
+# Move Note to Trash
+curl -X POST http://localhost:8000/api/notes/1/trash/ \
+-H "Authorization: Bearer <access_token>"
 
-Permanently Delete a Note: Delete a note permanently from the trash bin.
+# Create Label
+curl -X POST http://localhost:8000/api/labels/create/ \
+-H "Authorization: Bearer <access_token>" \
+-H "Content-Type: application/json" \
+-d '{"title": "Work"}'
 
-Automatic Cleanup: Notes in the trash bin for more than 30 days are automatically deleted.
+# View Trashed Notes
+curl -X GET http://localhost:8000/api/trash/notes/ \
+-H "Authorization: Bearer <access_token>"
 
-API Endpoints
-Get Notes by Label: /get-notes/<label_id>/ - Returns a JSON list of notes for a specific label.
+# Restore Note
+curl -X POST http://localhost:8000/api/trash/notes/1/ \
+-H "Authorization: Bearer <access_token>"
 
-Complete Note: /complete-note/<pk>/ - Toggles the completion status of a note.
+# Available Endpoints:
+# /api/register/                  POST    Register new user
+# /api/token/                     POST    Obtain JWT tokens
+# /api/token/refresh/             POST    Refresh access token
+# /api/logout/                    POST    Log out
+# /api/notes/                     GET     List all notes
+# /api/notes/<note_id>/           GET,PATCH Get/update note
+# /api/notes/create/              POST    Create new note
+# /api/notes/<note_id>/trash/     POST    Move note to trash
+# /api/labels/<label_id>/notes/   GET     Get notes by label
+# /api/labels/                    GET     List all labels
+# /api/labels/<label_id>/         GET,PATCH Get/update label
+# /api/labels/create/             POST    Create new label
+# /api/labels/<label_id>/trash/   POST    Move label to trash
+# /api/trash/notes/               GET     List trashed notes
+# /api/trash/notes/<note_id>/     GET,POST Get/restore trashed note
+# /api/trash/labels/              GET     List trashed labels
+# /api/trash/labels/<label_id>/   GET,POST Get/restore trashed label
 
-Pin Note: /pin-note/<pk>/ - Toggles the pin status of a note.
+# Contributing:
+# 1. Fork the repository
+# 2. Create new branch (git checkout -b feature/YourFeatureName)
+# 3. Commit changes (git commit -m 'Add some feature')
+# 4. Push to branch (git push origin feature/YourFeatureName)
+# 5. Open pull request
 
-Contributing
-Contributions are welcome! If you'd like to contribute, please follow these steps:
-
-Fork the repository.
-
-Create a new branch (git checkout -b feature/YourFeatureName).
-
-Commit your changes (git commit -m 'Add some feature').
-
-Push to the branch (git push origin feature/YourFeatureName).
-
-Open a pull request.
-
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-Acknowledgments
-Thanks to Django for providing a powerful web framework.
-
-Special thanks to the open-source community for their contributions.
-
-Contact
-If you have any questions or suggestions, feel free to reach out:
-
-Email: ebilebilli3gmail.com
-
-GitHub: https://github.com/ebilebilli
+# License: MIT
+# Contact: ebilebilli3@gmail.com | GitHub: ebilebilli

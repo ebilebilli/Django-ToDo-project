@@ -1,44 +1,40 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.models import User
-from django.contrib.auth import logout
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .serializers import UserSerializer, LoginSerializer, LogoutSerializer
 
-# Create your views here.
+from utils.permission import HeHasPermission
 
-from django.contrib import messages
-from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+  
+class RegisterAPIView(APIView):
+    permission_classes = [AllowAny]
 
-def register_request(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User registered successfully.'},status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-        if not username or not email or not password or not confirm_password:
-            messages.error(request, 'Please fill all fields')
-            return render(request, 'register.html')
 
-        if password != confirm_password:
-            messages.error(request, 'Passwords do not match')
-            return render(request, 'register.html')
+class LoginAPIView(APIView):
+    permission_classes = [AllowAny]
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already taken')
-            return render(request, 'register.html')
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already used')
-            return render(request, 'register.html')
 
-        User.objects.create_user(username=username, email=email, password=password)
-        messages.success(request, 'Account created successfully')
-        return redirect('account:login')
+class LogoutAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, HeHasPermission]
     
-    return render(request, 'register.html')
-
-
-def logout_request(request):
-    logout(request)
-    return redirect('account:login')
+    def post(self, request):
+        serializer = LogoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'detail': 'Successfully logged out.'}, status=status.HTTP_204_NO_CONTENT)

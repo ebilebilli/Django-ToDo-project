@@ -1,22 +1,27 @@
 from django.urls import path
-from . import views
+from views import *
 
 app_name = 'app'
 
 urlpatterns = [
-    path('', views.home_page, name='index'),
-    path('detail_page/<int:pk>/', views.detail_page, name='detail_page'),
-    path('get_notes/<int:label_id>/', views.get_notes, name='get_notes'),
-    path('edit_note/<int:pk>', views.edit_note, name='edit_note'),
-    path('create_new_label/', views.create_new_label, name='create_new_label'), 
-    path('create_new_note/', views.create_new_note, name='create_new_note'),
-    path('complete_note/<int:pk>/', views.complete_note, name='complete_note'),
-    path('delete-note/<int:pk>/', views.delete_note, name='delete_note'),
-    path('delete-note_permanently/<int:pk>/', views.delete_note_permanently, name='delete_note_permanently'),
-    path('restore_note/<int:pk>/', views.restore_note, name='restore_note'),
-    path('trash_bin/', views.trash_bin, name='trash_bin'),
-    path('delete-old-notes/', views.delete_old_note, name='delete_old_notes'),
-    path('delete-label/<int:pk>/', views.delete_label, name='delete_label'),
-    path('pin_note/<int:pk>/', views.pin_note, name='pin_note') 
-]
+    # Label endpoints
+    path('labels/', LabelListAPIView.as_view(), name='label-list'),
+    path('labels/<int:label_id>/', LabelDetailAPIView.as_view(), name='label-detail'),
+    path('labels/create/', CreateLabelAPIView.as_view(), name='label-create'),
+    path('labels/<int:label_id>/trash/', MoveLabelToTrashAPIView.as_view(), name='label-to-trash'),
 
+    # Note endpoints
+    path('notes/', NoteListAPIView.as_view(), name='note-list'),
+    path('notes/<int:note_id>/', NoteDetailAPIView.as_view(), name='note-detail'),
+    path('notes/create/', CreateNoteAPIView.as_view(), name='note-create'),
+    path('notes/<int:note_id>/trash/', MoveNoteToTrashAPIView.as_view(), name='note-to-trash'),
+    path('labels/<int:label_id>/notes/', NoteListForLabelAPIView.as_view(), name='note-list-for-label'),
+
+    # Trash-bin endpoints (labels)
+    path('trash/labels/', TrashBinLabelListAPIView.as_view(), name='trash-label-list'),
+    path('trash/labels/<int:label_id>/', LabelInTrashDetailAPIView.as_view(), name='trash-label-detail'),
+
+    # Trash-bin endpoints (notes)
+    path('trash/notes/', TrashBinNoteListAPIView.as_view(), name='trash-note-list'),
+    path('trash/notes/<int:note_id>/', NoteInTrashDetailAPIView.as_view(), name='trash-note_-detail'),
+]
