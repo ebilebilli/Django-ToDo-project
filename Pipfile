@@ -53,6 +53,7 @@ whitenoise = "==6.8.2"
 yarl = "==1.18.3"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
+drf-yasg = "*"
 
 [dev-packages]
 

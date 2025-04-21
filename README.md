@@ -23,6 +23,8 @@ This is a Django-based RESTful To-Do application that allows users to create, ma
   - Comprehensive API endpoints for all functionalities.
   - Pagination for note and label lists.
   - Secure access with JWT authentication and custom permissions (`HeHasPermission`).
+**API Documentation**:
+  - Interactive Swagger (OpenAPI) documentation for exploring and testing API endpoints.
 - **Modern Architecture**:
   - Uses Django REST Framework and Simple JWT for authentication.
   - Modular code structure with serializers, custom permissions, and pagination.
