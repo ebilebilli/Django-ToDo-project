@@ -18,7 +18,8 @@ This is a Django-based RESTful To-Do application that allows users to create, ma
 - **Trash Bin**:
   - Move notes and labels to a trash bin for temporary storage.
   - Restore notes or labels from the trash bin.
-  - Planned automatic cleanup for items in the trash bin after 30 days (using Celery Beat, under development).
+  - The periodic task for cleaning up trash (notes and labels older than 30 days) is defined in the Celery Beat schedule.
+
 - **RESTful API**:
   - Comprehensive API endpoints for all functionalities.
   - Pagination for note and label lists.
@@ -35,6 +36,24 @@ This is a Django-based RESTful To-Do application that allows users to create, ma
 - **Authentication**: Simple JWT (JSON Web Tokens)
 - **Database**: SQLite (default, can be configured for PostgreSQL or others)
 - **Python Libraries**: `djangorestframework`, `djangorestframework-simplejwt`
+
+## Task Scheduling and Asynchronous Processing
+
+To handle periodic tasks, the project integrates **Celery** with **Redis** as the message broker and **Celery Beat** for scheduling. This setup is used to automatically delete notes and labels in the trash that are older than 30 days. While the project is lightweight and does not heavily rely on asynchronous processing, Celery ensures efficient handling of scheduled cleanup tasks.
+
+### Technologies Added
+- **Celery**: Distributed task queue for asynchronous task processing.
+- **Redis**: In-memory data store used as the message broker for Celery.
+- **Celery Beat**: Scheduler for running periodic tasks.
+
+  ### Setup Instructions
+    Install Redis and ensure it is running locally or on a configured server.
+    Install the required Python packages:
+    pip install celery redis django-celery-beat
+    Run the Celery worker:
+    celery -A project_name worker --loglevel=info
+    Run Celery Beat for periodic tasks:
+    celery -A project_name beat --loglevel=info
 
 # Installation
 git clone https://github.com/ebilebilli/django-todo-api.git

@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
+    'django_celery_beat',
     
     #apps
     'app',
@@ -93,10 +94,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        'default': dj_database_url.config(conn_max_age=600),
-        'default': dj_database_url.config(
-            default='postgres://user:password@localhost:5432/dbname'
-        )
     }
 }
 
@@ -145,7 +142,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#jwt settings
+#Jwt settings
 from datetime import timedelta
 
 SIMPLE_JWT = {
@@ -154,4 +151,24 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+}
+
+#Celery and Redis settings
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = "Asia/Baku"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+#Celery beat settings:
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'every-night-check': {
+        'task': 'app.tasks.clean_expired_trashbins',
+        'schedule': crontab(hour=23, minute=59),
+    },
 }

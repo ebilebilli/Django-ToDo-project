@@ -57,6 +57,8 @@ drf-yasg = "*"
 pytest = "*"
 pytest-django = "*"
 pytest-cov = "*"
+django-celery-beat = "*"
+celery = {extras = ["redis"], version = "*"}
 
 [dev-packages]
 
