@@ -37,6 +37,8 @@ This is a Django-based RESTful To-Do application that allows users to create, ma
 - **Database**: SQLite (default, can be configured for PostgreSQL or others)
 - **Python Libraries**: `djangorestframework`, `djangorestframework-simplejwt`
 
+
+
 ## Task Scheduling and Asynchronous Processing
 
 To handle periodic tasks, the project integrates **Celery** with **Redis** as the message broker and **Celery Beat** for scheduling. This setup is used to automatically delete notes and labels in the trash that are older than 30 days. While the project is lightweight and does not heavily rely on asynchronous processing, Celery ensures efficient handling of scheduled cleanup tasks.
