@@ -14,7 +14,8 @@ class LoginRequiredMiddleware:
     def __call__(self, request):
         if request.path.startswith('/api/'):
             return self.get_response(request)
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('login'))
+            
+        if not request.user.is_authenticated and not request.path == settings.LOGIN_URL:
+            return HttpResponseRedirect(settings.LOGIN_URL)  
         
         return self.get_response(request)
