@@ -13,6 +13,7 @@ urlpatterns = [
     # Note endpoints
     path('notes/', NoteListAPIView.as_view(), name='note-list'),
     path('notes/<int:note_id>/', NoteDetailAPIView.as_view(), name='note-detail'),
+    path('notes/<int:note_id>/', NotePinChangeAPIView.as_view(), name='note-pin-change'),
     path('notes/create/', CreateNoteAPIView.as_view(), name='note-create'),
     path('notes/<int:note_id>/trash/', MoveNoteToTrashAPIView.as_view(), name='note-to-trash'),
     path('labels/<int:label_id>/notes/', NoteListForLabelAPIView.as_view(), name='note-list-for-label'),

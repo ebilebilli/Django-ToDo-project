@@ -10,5 +10,5 @@ def clean_expired_trashbins():
     count = expired_bins.count()
     if count > 0:
         with transaction.atomic():
-            expired_bins.delete()
+            expired_bins.delete() 
    

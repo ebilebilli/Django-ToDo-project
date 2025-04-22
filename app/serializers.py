@@ -14,6 +14,19 @@ class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = '__all__'
+
+class NoteUpdateSerializer(serializers.ModelSerializer):
+    label = serializers.SlugRelatedField(queryset=Label.objects.filter(is_trashed=False), slug_field='title')
+
+    class Meta:
+        model = Note
+        fields = '__all__'
+        exclude = ['is_pinned']
+
+class NotePinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ['is_pinned']
         
 
 class TrashBinSerializer(serializers.ModelSerializer):
