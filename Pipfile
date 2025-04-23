@@ -60,6 +60,7 @@ pytest-cov = "*"
 django-celery-beat = "*"
 celery = {extras = ["redis"], version = "*"}
 docker = "*"
+dotenv = "*"
 
 [dev-packages]
 

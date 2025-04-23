@@ -35,7 +35,11 @@ This is a Django-based RESTful To-Do application that allows users to create, ma
 - **Backend**: Django, Django REST Framework
 - **Authentication**: Simple JWT (JSON Web Tokens)
 - **Database**: SQLite (default, can be configured for PostgreSQL or others)
-- **Python Libraries**: `djangorestframework`, `djangorestframework-simplejwt`
+- **Python Libraries**: `djangorestframework`, `djangorestframework-simplejwt`, `python-dotenv`, `celery`, `redis`, `django-celery-beat`
+- **Task Queue**: Celery (for asynchronous task processing)
+- **Message Broker**: Redis (in-memory data store for Celery)
+- **Scheduler**: Celery Beat (for periodic tasks)
+- **Containerization**: Docker and Docker Compose (for simplified deployment and development)
 
 
 
@@ -48,14 +52,13 @@ To handle periodic tasks, the project integrates **Celery** with **Redis** as th
 - **Redis**: In-memory data store used as the message broker for Celery.
 - **Celery Beat**: Scheduler for running periodic tasks.
 
-  ### Setup Instructions
-    Install Redis and ensure it is running locally or on a configured server.
-    Install the required Python packages:
-    pip install celery redis django-celery-beat
-    Run the Celery worker:
-    celery -A project_name worker --loglevel=info
-    Run Celery Beat for periodic tasks:
-    celery -A project_name beat --loglevel=info
+## Setup Instructions
+
+### Prerequisites
+- **Docker**: Install Docker and Docker Compose to run the application in containers.
+- **Python**: If running locally without Docker, Python 3.8+ is required.
+- **Redis**: Required for Celery (included in Docker setup).
+
 
 # Installation
 git clone https://github.com/ebilebilli/django-todo-api.git
@@ -110,25 +113,29 @@ curl -X GET http://localhost:8000/api/trash/notes/ \
 # Restore Note
 curl -X POST http://localhost:8000/api/trash/notes/1/ \
 -H "Authorization: Bearer <access_token>"
+## Available Endpoints
 
-# Available Endpoints:
-# /api/register/                  POST    Register new user
-# /api/token/                     POST    Obtain JWT tokens
-# /api/token/refresh/             POST    Refresh access token
-# /api/logout/                    POST    Log out
-# /api/notes/                     GET     List all notes
-# /api/notes/<note_id>/           GET,PATCH Get/update note
-# /api/notes/create/              POST    Create new note
-# /api/notes/<note_id>/trash/     POST    Move note to trash
-# /api/labels/<label_id>/notes/   GET     Get notes by label
-# /api/labels/                    GET     List all labels
-# /api/labels/<label_id>/         GET,PATCH Get/update label
-# /api/labels/create/             POST    Create new label
-# /api/labels/<label_id>/trash/   POST    Move label to trash
-# /api/trash/notes/               GET     List trashed notes
-# /api/trash/notes/<note_id>/     GET,POST Get/restore trashed note
-# /api/trash/labels/              GET     List trashed labels
-# /api/trash/labels/<label_id>/   GET,POST Get/restore trashed label
+All API endpoints are prefixed with `/api/v1/`. Account-related endpoints are under `/api/v1/accounts/`, while note and label-related endpoints are under `/api/v1/app/`. Below is a list of available endpoints:
+
+- `/api/v1/accounts/register/`             POST    Register new user
+- `/api/v1/accounts/token/`               POST    Obtain JWT tokens
+- `/api/v1/accounts/token/refresh/`       POST    Refresh access token
+- `/api/v1/accounts/logout/`              POST    Log out
+- `/api/v1/app/notes/`                    GET     List all notes
+- `/api/v1/app/notes/<int:note_id>/`      GET,PATCH Get or update note details
+- `/api/v1/app/notes/<int:note_id>/`      PATCH   Change pin status
+- `/api/v1/app/notes/create/`             POST    Create new note
+- `/api/v1/app/notes/<int:note_id>/trash/` POST   Move note to trash
+- `/api/v1/app/labels/<int:label_id>/notes/` GET  Get notes by label
+- `/api/v1/app/labels/`                   GET     List all labels
+- `/api/v1/app/labels/<int:label_id>/`    GET,PATCH Get or update label
+- `/api/v1/app/labels/create/`            POST    Create new label
+- `/api/v1/app/labels/<int:label_id>/trash/` POST Move label to trash
+- `/api/v1/app/trash/notes/`              GET     List trashed notes
+- `/api/v1/app/trash/notes/<int:note_id>/` GET,POST Get or restore trashed note
+- `/api/v1/app/trash/labels/`             GET     List trashed labels
+- `/api/v1/app/trash/labels/<int:label_id>/` GET,POST Get or restore trashed label
+- `/swagger/`                             GET     Interactive Swagger API documentation
 
 # Contributing:
 # 1. Fork the repository

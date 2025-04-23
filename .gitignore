@@ -1,0 +1,108 @@
+# Python/Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+*.mo
+*.pot
+*.log
+local_settings.py
+db.sqlite3
+*.sqlite3
+migrations/
+*.swp
+*.swo
+*.swn
+
+# Environment variables
+.env
+.env.bak
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Django static and media files
+staticfiles/
+media/
+collected_static/
+
+# Docker
+*.dockerignore
+Dockerfile.local
+docker-compose.local.yml
+docker-compose.override.yml
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Virtual environment
+venv/
+.env/
+env/
+ENV/
+
+# Celery and Redis
+celerybeat-schedule
+celerybeat-schedule.*
+*.pid
+*.sock
+*.lock
+
+# Testing and coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.junit.xml
+tests/reports/
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Miscellaneous
+*.bak
+*.backup
+*.tmp
+*.temp
+*.swp
+*~
+.project
+.pydevproject
+.settings/
+*.log.*
