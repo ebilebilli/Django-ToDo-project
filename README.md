@@ -40,6 +40,7 @@ This is a Django-based RESTful To-Do application that allows users to create, ma
 - **Message Broker**: Redis (in-memory data store for Celery)
 - **Scheduler**: Celery Beat (for periodic tasks)
 - **Containerization**: Docker and Docker Compose (for simplified deployment and development)
+- **Logging**: Python `logging` module with custom handlers for console and file output(`logs/app.log`, `logs/account.log`)
 
 
 
@@ -58,6 +59,7 @@ To handle periodic tasks, the project integrates **Celery** with **Redis** as th
 - **Docker**: Install Docker and Docker Compose to run the application in containers.
 - **Python**: If running locally without Docker, Python 3.8+ is required.
 - **Redis**: Required for Celery (included in Docker setup).
+- **Logs Directory**: Ensure the `logs/` directory exists for storing log files (`logs/app.log`, `logs/account.log`).
 
 
 # Installation

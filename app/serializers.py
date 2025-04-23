@@ -9,7 +9,7 @@ class LabelSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
-    label = serializers.SlugRelatedField(queryset=Label.objects.filter(is_trashed=False), slug_field='title')
+    label = serializers.SlugRelatedField(queryset=Label.objects.filter(is_trashed=False), slug_field='title', required=True)
 
     class Meta:
         model = Note

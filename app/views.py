@@ -55,6 +55,7 @@ class LabelDetailAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def patch(self, request, label_id):
+        user = request.user
         label = get_object_or_404(Label.objects.filter(is_trashed=False), id=label_id)
         serializer = LabelSerializer(label, data=request.data, partial=True)
         if serializer.is_valid():
@@ -290,56 +291,3 @@ class NoteInTrashDetailAPIView(APIView):
             note.save()
             Trash_Bin.objects.filter(note=note).delete()
             return Response({'message': 'Note restored successfully'}, status=status.HTTP_200_OK)
-
-
-
-    
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

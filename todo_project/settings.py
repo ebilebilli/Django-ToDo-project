@@ -160,3 +160,52 @@ CACHES = {
         }
     }
 }
+
+#Logging settings
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/app.log',
+            'formatter': 'verbose',
+        },
+        'account_file': {  
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/account.log',  
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'app': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'account': {
+            'handlers': ['console', 'account_file'],  
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    }
+}
