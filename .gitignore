@@ -3,14 +3,8 @@
 __pycache__/
 *.pyo
 *.pyd
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-*.egg-info/
 *.egg
+*.egg-info/
 pip-log.txt
 pip-delete-this-directory.txt
 .tox/
@@ -29,7 +23,6 @@ coverage.xml
 local_settings.py
 db.sqlite3
 *.sqlite3
-migrations/
 *.swp
 *.swo
 *.swn
@@ -47,11 +40,28 @@ staticfiles/
 media/
 collected_static/
 
+# Django migrations (optional, remove if you want to track migrations)
+# migrations/
+
 # Docker
-*.dockerignore
+*.dockerignore.local
 Dockerfile.local
 docker-compose.local.yml
 docker-compose.override.yml
+
+# Celery and Redis
+celerybeat-schedule
+celerybeat-schedule.*
+*.pid
+*.sock
+*.lock
+
+# Virtual environment
+venv/
+env/
+ENV/
+venv.bak/
+env.bak/
 
 # IDE and editor files
 .idea/
@@ -64,19 +74,6 @@ docker-compose.override.yml
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Virtual environment
-venv/
-.env/
-env/
-ENV/
-
-# Celery and Redis
-celerybeat-schedule
-celerybeat-schedule.*
-*.pid
-*.sock
-*.lock
 
 # Testing and coverage
 htmlcov/
@@ -95,12 +92,18 @@ dist/
 *.egg
 MANIFEST
 
+# Pipenv
+Pipfile.lock
+
+# SQLite database artifacts
+celerybeat-schedule-shm
+celerybeat-schedule-wal
+
 # Miscellaneous
 *.bak
 *.backup
 *.tmp
 *.temp
-*.swp
 *~
 .project
 .pydevproject
