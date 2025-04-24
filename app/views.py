@@ -10,8 +10,8 @@ from .serializers import *
 from utils.permission import HeHasPermission
 from utils.pagination import CustomPagination
 
-
 class LabelListAPIView(APIView):
+    """List all active (non-trashed) labels with pagination and caching support."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
     pagination_class = CustomPagination
@@ -39,6 +39,7 @@ class LabelListAPIView(APIView):
     
 
 class LabelDetailAPIView(APIView):
+    """Retrieve details or partially update a specific active label."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -65,6 +66,7 @@ class LabelDetailAPIView(APIView):
     
 
 class CreateLabelAPIView(APIView):
+    """Create a new label for the authenticated user."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -79,6 +81,7 @@ class CreateLabelAPIView(APIView):
     
 
 class MoveLabelToTrashAPIView(APIView):
+    """Move a label to trash bin and mark it as trashed."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -94,6 +97,7 @@ class MoveLabelToTrashAPIView(APIView):
 
 
 class NoteListForLabelAPIView(APIView):
+    """List all active notes belonging to a specific label with pagination."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
     pagination_class = CustomPagination
@@ -122,6 +126,7 @@ class NoteListForLabelAPIView(APIView):
         
 
 class NoteListAPIView(APIView):
+    """List all active notes with pagination and caching, ordered by creation date."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
     pagination_class = CustomPagination
@@ -149,6 +154,7 @@ class NoteListAPIView(APIView):
     
 
 class NoteDetailAPIView(APIView):
+    """Retrieve or partially update a specific active note (excluding pin status)."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -173,6 +179,7 @@ class NoteDetailAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class NotePinChangeAPIView(APIView):
+    """Toggle pin status of a note with validation for maximum pinned notes."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -191,6 +198,7 @@ class NotePinChangeAPIView(APIView):
     
 
 class CreateNoteAPIView(APIView):
+    """Create a new note for the authenticated user."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -205,6 +213,7 @@ class CreateNoteAPIView(APIView):
 
 
 class MoveNoteToTrashAPIView(APIView):
+    """Move a note to trash bin and mark it as trashed."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -220,6 +229,7 @@ class MoveNoteToTrashAPIView(APIView):
 
 
 class TrashBinLabelListAPIView(APIView):
+    """List all trashed labels with optional filtering by label title."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
     pagination_class = CustomPagination
@@ -237,6 +247,7 @@ class TrashBinLabelListAPIView(APIView):
 
 
 class LabelInTrashDetailAPIView(APIView):
+    """Retrieve details of a trashed label or restore it to active status."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 
@@ -255,6 +266,7 @@ class LabelInTrashDetailAPIView(APIView):
 
 
 class TrashBinNoteListAPIView(APIView):
+    """List all trashed notes with optional filtering by note title."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
     pagination_class = CustomPagination
@@ -271,6 +283,7 @@ class TrashBinNoteListAPIView(APIView):
 
 
 class NoteInTrashDetailAPIView(APIView):
+    """Retrieve details of a trashed note or restore it to active status."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, HeHasPermission]
 

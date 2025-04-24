@@ -35,18 +35,6 @@ class Note(models.Model):
         blank=True,
         related_name='notes'
     )
-
-    PROCESSING = 'Processing'
-    COMPLETED = 'Completed'
-    DELETED = 'Deleted'
-    
-    STATUS_BAR_LIST = [
-        (PROCESSING, 'Processing'),
-        (COMPLETED, 'Completed'),
-        (DELETED, 'Deleted')
-    ]    
-    
-    status = models.CharField(max_length=11, choices=STATUS_BAR_LIST, default=PROCESSING)
     is_completed = models.BooleanField(default=False)
     is_pinned = models.BooleanField(default=False)
     is_trashed = models.BooleanField(default=False)
